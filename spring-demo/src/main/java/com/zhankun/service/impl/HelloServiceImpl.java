@@ -15,9 +15,14 @@ public class HelloServiceImpl implements HelloService {
 	}
 
 	@Override
-	@Transactional
 	public String findName(String name) {
 		System.out.println("我这个方法没有切面");
 		return "我是find方法";
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void testTransactional(String name) {
+		System.out.println("测试事务........");
 	}
 }

@@ -12,6 +12,8 @@ repositories {
 dependencies {
     compile(project(":spring-context"))
     compile(project(":spring-aspects"))
+    compile(project(":spring-jdbc"))
+    compile 'mysql:mysql-connector-java:8.0.15'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }

@@ -50,6 +50,7 @@ import org.springframework.util.ClassUtils;
  * @author Stephane Nicoll
  * @since 2.0
  */
+// 基于注解的事务  第一种是基于AspectJ，另一种是基于AOP的，可以通过指定mode属性决定，默认情况都是基于AOP的。
 class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**

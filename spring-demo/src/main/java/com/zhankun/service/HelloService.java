@@ -9,4 +9,6 @@ public interface HelloService {
 	String getName(String name);
 
 	String findName(String name);
+
+	void testTransactional(String name);
 }

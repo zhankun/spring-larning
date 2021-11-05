@@ -41,6 +41,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.transaction.support.DefaultTransactionDefinition
  * @see org.springframework.transaction.interceptor.TransactionAttribute
  */
+// 事务的定义，包含了事务中常用的属性，比如传播行为、隔离级别、超时时间等。
 public interface TransactionDefinition {
 
 	/**

@@ -109,6 +109,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 		else {
 			// We need to work it out.
+			// 获取@Transactional的属性值，并放入缓存
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
 			if (txAttr == null) {
