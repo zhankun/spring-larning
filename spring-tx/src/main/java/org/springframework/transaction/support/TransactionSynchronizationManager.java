@@ -177,6 +177,7 @@ public abstract class TransactionSynchronizationManager {
 	public static void bindResource(Object key, Object value) throws IllegalStateException {
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
 		Assert.notNull(value, "Value must not be null");
+		// TODO 获取放在ThreadLocal里面的connectionHolder的
 		Map<Object, Object> map = resources.get();
 		// set ThreadLocal Map if none found
 		if (map == null) {

@@ -343,12 +343,13 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 		// Use defaults if no transaction definition given.
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
-
+		// TODO 获取事务，多个方法嵌套的时候，第一次进来的时候，是获取不到的。保存在ThreadLocal中。
 		Object transaction = doGetTransaction();
 		boolean debugEnabled = logger.isDebugEnabled();
 
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
+			// TODO 已经存才事务
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
@@ -371,6 +372,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			}
 			try {
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
+				// TODO 刚进来的时候，是没有任何事物的。这里的newTransaction参数为true，后面事务提交的时候是根据
+				// TODO 这个参数来判断的。只有true的时候，才会提交事务
 				DefaultTransactionStatus status = newTransactionStatus(
 						def, transaction, true, newSynchronization, debugEnabled, suspendedResources);
 				doBegin(transaction, def);
@@ -420,6 +423,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				logger.debug("Suspending current transaction, creating new transaction with name [" +
 						definition.getName() + "]");
 			}
+			// TODO 挂起已经存在的线程
 			SuspendedResourcesHolder suspendedResources = suspend(transaction);
 			try {
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
@@ -450,6 +454,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				// Usually uses JDBC 3.0 savepoints. Never activates Spring synchronization.
 				DefaultTransactionStatus status =
 						prepareTransactionStatus(definition, transaction, false, false, debugEnabled, null);
+				// TODO 创建回滚点
 				status.createAndHoldSavepoint();
 				return status;
 			}
@@ -490,6 +495,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			}
 		}
 		boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
+		// TODO 注意这里的第三个参数，newTransaction为false。拿到当前线程所对应的事务
 		return prepareTransactionStatus(definition, transaction, false, newSynchronization, debugEnabled, null);
 	}
 
@@ -741,6 +747,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 						logger.debug("Initiating transaction commit");
 					}
 					unexpectedRollback = status.isGlobalRollbackOnly();
+					// TODO 注意上面的条件，只有status.isNewTransaction()才能进入，也就是newTransaction这个参数需要为true。
+					//  说明是最后一个提交了
 					doCommit(status);
 				}
 				else if (isFailEarlyOnGlobalRollbackOnly()) {
@@ -788,6 +796,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 		}
 		finally {
+			// TODO 事务提交之后清，清除ThreadLocal里面存放的线程和数据库连接的对应关系，并恢复老的连接关系
 			cleanupAfterCompletion(status);
 		}
 	}
@@ -1009,6 +1018,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				logger.debug("Resuming suspended transaction after completion of inner transaction");
 			}
 			Object transaction = (status.hasTransaction() ? status.getTransaction() : null);
+			// TODO 恢复原有的事务
 			resume(transaction, (SuspendedResourcesHolder) status.getSuspendedResources());
 		}
 	}

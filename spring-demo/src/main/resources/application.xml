@@ -9,7 +9,9 @@
          http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<bean id="helloService" class="com.zhankun.service.impl.HelloServiceImpl"/>
+	<bean id="helloService" class="com.zhankun.service.impl.HelloServiceImpl">
+		<property name="testAopService" ref="testAopService"></property>
+	</bean>
 	<bean id="timeHandler" class="com.zhankun.aop.TimeHandler"/>
 	<bean id="testAopService" class="com.zhankun.service.TestAopService"/>
 

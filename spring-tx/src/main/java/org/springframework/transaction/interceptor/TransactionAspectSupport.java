@@ -356,11 +356,12 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			}
 			catch (Throwable ex) {
 				// target invocation exception
-				// TODO 回滚事务
+				// TODO 回滚事务，清除当前事务，并恢复被挂起的事务
 				completeTransactionAfterThrowing(txInfo, ex);
 				throw ex;
 			}
 			finally {
+				// TODO 恢复旧的事务信息
 				cleanupTransactionInfo(txInfo);
 			}
 
@@ -371,7 +372,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 					retVal = VavrDelegate.evaluateTryFailure(retVal, txAttr, status);
 				}
 			}
-			// TODO 执行结束后，提交事务
+			// TODO 执行结束后，提交事务，清除当前事务，并恢复被挂起的事务
 			commitTransactionAfterReturning(txInfo);
 			return retVal;
 		}

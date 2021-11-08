@@ -237,6 +237,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	protected Object doGetTransaction() {
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
+		// TODO 从ThreadLocal中获取当然线程绑定的连接
 		ConnectionHolder conHolder =
 				(ConnectionHolder) TransactionSynchronizationManager.getResource(obtainDataSource());
 		txObject.setConnectionHolder(conHolder, false);
@@ -260,14 +261,19 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		try {
 			if (!txObject.hasConnectionHolder() ||
 					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
+				// TODO 从数据库连接池中拿出一个连接
 				Connection newCon = obtainDataSource().getConnection();
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
+				// newConnectionHolder ----> true
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
 			txObject.getConnectionHolder().setSynchronizedWithTransaction(true);
+			// TODO 获取连接。但是如何保证使用相同的连接来操作者同一个事务？
+			// 可以采用，线程级别的局部变量，ThreadLocal，将连接池都放到threadLocal中
+			// 但是假如，如果在同一个方法内，采用了不同线程来操作。上述方法将无效，
 			con = txObject.getConnectionHolder().getConnection();
 
 			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);
@@ -281,6 +287,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
+				// TODO 事务自动提交设置为false
 				con.setAutoCommit(false);
 			}
 
@@ -294,6 +301,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 			// Bind the connection holder to the thread.
 			if (txObject.isNewConnectionHolder()) {
+				// TODO 判断是不是新的连接，上面设置的，为true
 				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
 			}
 		}
@@ -365,6 +373,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 		// Remove the connection holder from the thread, if exposed.
 		if (txObject.isNewConnectionHolder()) {
+			// TODO 清除threadLocal中事务和连接的对应关系
 			TransactionSynchronizationManager.unbindResource(obtainDataSource());
 		}
 

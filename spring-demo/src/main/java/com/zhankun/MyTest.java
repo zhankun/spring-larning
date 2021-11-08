@@ -1,7 +1,6 @@
 package com.zhankun;
 
 import com.zhankun.service.HelloService;
-import com.zhankun.service.TestAopService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
