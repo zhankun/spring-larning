@@ -113,11 +113,16 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 获取对应的解析器
 		HandlerMethodArgumentResolver resolver = getArgumentResolver(parameter);
 		if (resolver == null) {
 			throw new IllegalArgumentException("Unsupported parameter type [" +
 					parameter.getParameterType().getName() + "]. supportsParameter should be called first.");
 		}
+		// 通过HandlerMethodArgumentResolver这个接口来实现参数解析
+		// 如果请求参数是String name这种，则对应的解析器是ServletRequestMethodArgumentResolver
+		// 如果请求参数是@RequestBody User user 这种，则对应的解析器是RequestResponseBodyMethodProcessor
+		// 如果请求参数是@PathVariable Long id 这种，则对应的解析器是PathVariableMethodArgumentResolver
 		return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
 	}
 

@@ -16,20 +16,16 @@
 
 package org.springframework.test.web.servlet.samples.standalone;
 
-import javax.validation.constraints.NotNull;
-
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 /**
@@ -42,6 +38,7 @@ public class ResponseBodyTests {
 
 	@Test
 	public void json() throws Exception {
+
 		standaloneSetup(new PersonController()).build()
 				.perform(get("/person/Lee").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
@@ -55,6 +52,25 @@ public class ResponseBodyTests {
 				.andExpect(jsonPath("$.age", equalTo(42.0f), Float.class));
 	}
 
+	@Test
+	public void testRequestBody() throws Exception {
+/*		String string = standaloneSetup(new PersonController()).build()
+				.perform(get("/person/test").content("{\"name\":\"张三\",\"age\":1}").accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse().getContentAsString(Charset.defaultCharset());
+		System.out.println(string);*/
+		standaloneSetup(new PersonController()).build()
+				.perform(post("/person/test").content("{\"name\":\"zhangsan\"}".getBytes("UTF-8")).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name").value("张三"));
+	}
+
+	@Test
+	public void testPathVariable() throws Exception {
+		standaloneSetup(new PersonController()).build()
+				.perform(get("/person/123").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+	}
+
 
 	@RestController
 	private static class PersonController {
@@ -63,6 +79,19 @@ public class ResponseBodyTests {
 		public Person get(@PathVariable String name) {
 			Person person = new Person(name);
 			person.setAge(42);
+			return person;
+		}
+
+		@PostMapping("/person/test")
+		public Person testGet(@RequestBody Person person) {
+			System.out.println("获取到的参数是:" + person.toString());
+			return person;
+		}
+
+		@GetMapping("person/testPathVariable/{id}")
+		public Person testPathVariable(@PathVariable Integer id) {
+			Person person = new Person("test");
+			person.setAge(id);
 			return person;
 		}
 	}
@@ -89,6 +118,14 @@ public class ResponseBodyTests {
 
 		public void setAge(int age) {
 			this.age = age;
+		}
+
+		@Override
+		public String toString() {
+			return "Person{" +
+					"name='" + name + '\'' +
+					", age=" + age +
+					'}';
 		}
 	}
 

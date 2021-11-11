@@ -23,7 +23,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 /**
  * Strategy interface to handle the value returned from the invocation of a
  * handler method .
- *
+ * 返回值处理器接口
  * @author Arjen Poutsma
  * @since 3.1
  * @see HandlerMethodArgumentResolver

@@ -12,6 +12,7 @@ public class TestAopService {
 	@Transactional(propagation = Propagation.NESTED, rollbackFor = Exception.class)
 	public void testAop() {
 		System.out.println("我是没有接口的service");
+
 /*		if (true) {
 			throw new NullPointerException();
 		}*/
